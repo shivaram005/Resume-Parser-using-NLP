@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Resume Parser</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-8 animate__animated animate__fadeInDown">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-file-alt text-blue-600 mr-3"></i>
+                Smart Resume Parser
+            </h1>
+            <p class="text-gray-600 text-lg">Upload your resume and get structured insights instantly</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 animate__animated animate__fadeInUp">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">Upload Resume</h2>
+                <p class="text-gray-600">Support for PDF and DOCX files</p>
+            </div>
+            
+            <form id="uploadForm" class="space-y-6">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors duration-300" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-lg text-gray-600 mb-2">Drag and drop your resume here</p>
+                    <p class="text-sm text-gray-500 mb-4">or</p>
+                    <input type="file" id="resumeFile" accept=".pdf,.docx" class="hidden" required />
+                    <button type="button" onclick="document.getElementById('resumeFile').click()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-medium">
+                        <i class="fas fa-upload mr-2"></i>Choose File
+                    </button>
+                    <p class="text-xs text-gray-500 mt-2">Maximum file size: 10MB</p>
+                </div>
+                
+                <div class="flex justify-center">
+                    <button type="submit" id="parseBtn" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-magic mr-2"></i>Parse Resume
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="hidden bg-white rounded-2xl shadow-xl p-8 mb-8 animate__animated animate__fadeIn">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Processing your resume...</h3>
+                <p class="text-gray-600">Extracting information using advanced NLP techniques</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden animate__animated animate__fadeIn">
+            <!-- Confidence Score -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">
+                        <i class="fas fa-chart-line text-green-600 mr-2"></i>Parsing Confidence
+                    </h3>
+                    <div class="flex space-x-2">
+                        <button id="exportJson" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-300 text-sm">
+                            <i class="fas fa-download mr-1"></i>Export JSON
+                        </button>
+                        <button id="copyData" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors duration-300 text-sm">
+                            <i class="fas fa-copy mr-1"></i>Copy Data
+                        </button>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1 bg-gray-200 rounded-full h-3">
+                        <div id="confidenceBar" class="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                    <span id="confidenceScore" class="text-lg font-semibold text-gray-800">0%</span>
+                </div>
+            </div>
+
+            <!-- Structured Data -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Personal Information -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 animate__animated animate__fadeInLeft">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-user text-blue-600 mr-2"></i>Personal Information
+                    </h3>
+                    <div id="personalInfo" class="space-y-3">
+                        <!-- Personal info will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 animate__animated animate__fadeInRight">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-tools text-purple-600 mr-2"></i>Skills & Technologies
+                    </h3>
+                    <div id="skillsSection" class="flex flex-wrap gap-2">
+                        <!-- Skills will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Experience -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 animate__animated animate__fadeInLeft">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-briefcase text-green-600 mr-2"></i>Work Experience
+                    </h3>
+                    <div id="experienceSection" class="space-y-4">
+                        <!-- Experience will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 animate__animated animate__fadeInRight">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-graduation-cap text-indigo-600 mr-2"></i>Education
+                    </h3>
+                    <div id="educationSection" class="space-y-4">
+                        <!-- Education will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 animate__animated animate__fadeInLeft">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-project-diagram text-orange-600 mr-2"></i>Projects
+                    </h3>
+                    <div id="projectsSection" class="space-y-3">
+                        <!-- Projects will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 animate__animated animate__fadeInRight">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                        <i class="fas fa-certificate text-red-600 mr-2"></i>Certifications
+                    </h3>
+                    <div id="certificationsSection" class="space-y-3">
+                        <!-- Certifications will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 
